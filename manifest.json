@@ -2,7 +2,7 @@
   "name": "スピードたしざん！",
   "short_name": "はやたしざん",
   "description": "4さいのこがはやくたしざんをれんしゅう！",
-  "start_url": "./index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#F9F7E8",
   "theme_color": "#4ECDC4",
