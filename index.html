@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#4ECDC4">
+    <title>スピードたしざん！</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
+        
+        :root {
+            --primary: #4ECDC4;
+            --accent: #FF6B6B;
+            --bg: #F9F7E8;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: var(--bg);
+            color: #333;
+            overflow: hidden;
+            touch-action: manipulation;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background: #4ECDC4;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 1.8rem;
+            font-weight: 900;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .screen {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            gap: 20px;
+        }
+        .screen.active { display: flex; }
+        
+        /* トップ画面 */
+        #top-screen h1 {
+            font-size: 3.5rem;
+            margin-bottom: 30px;
+            color: #FF6B6B;
+            text-shadow: 4px 4px 0 #fff;
+        }
+        .big-btn {
+            font-size: 2.2rem;
+            padding: 25px 50px;
+            border-radius: 30px;
+            background: #FF9800;
+            color: white;
+            border: none;
+            box-shadow: 0 8px 0 #e68a00;
+            width: 90%;
+            max-width: 420px;
+        }
+        .big-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 #e68a00; }
+        
+        /* 問題画面 */
+        #problem {
+            font-size: 5.5rem;
+            font-weight: 900;
+            background: white;
+            padding: 20px 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            text-align: center;
+            min-width: 300px;
+        }
+        #choices {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 420px;
+        }
+        .choice-btn {
+            font-size: 3rem;
+            font-weight: 900;
+            padding: 30px;
+            background: #FFEEAD;
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 8px 0 #f0d68a;
+            color: #333;
+        }
+        .choice-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #f0d68a;
+        }
+        
+        /* タイマー */
+        #timer-container {
+            position: relative;
+            width: 160px;
+            height: 160px;
+        }
+        #timer-svg {
+            transform: rotate(-90deg);
+        }
+        #timer-bg {
+            fill: none;
+            stroke: #eee;
+            stroke-width: 18;
+        }
+        #timer-progress {
+            fill: none;
+            stroke: #FF6B6B;
+            stroke-width: 18;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.05s linear;
+        }
+        #timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #333;
+        }
+        
+        /* フィードバック */
+        #feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12rem;
+            font-weight: 900;
+            z-index: 100;
+            display: none;
+            pointer-events: none;
+            text-shadow: 0 0 30px rgba(0,0,0,0.3);
+        }
+        .correct { color: #4CAF50; animation: pop 0.6s; }
+        .wrong { color: #FF6B6B; animation: shake 0.5s; }
+        
+        @keyframes pop {
+            0% { transform: translate(-50%, -50%) scale(0.3); }
+            60% { transform: translate(-50%, -50%) scale(1.3); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        @keyframes shake {
+            0%,100% { transform: translate(-50%, -50%); }
+            25% { transform: translate(-60%, -50%); }
+            75% { transform: translate(-40%, -50%); }
+        }
+        
+        /* 結果画面 */
+        #result-screen {
+            text-align: center;
+        }
+        #total-score {
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: #FF6B6B;
+            margin: 10px 0;
+        }
+        #stamp {
+            font-size: 9rem;
+            margin: 20px 0;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
+            transition: transform 0.4s;
+        }
+        #stamp:hover { transform: scale(1.1) rotate(8deg); }
+        
+        /* ランキング */
+        #ranking-list {
+            width: 100%;
+            max-width: 460px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .date-header {
+            background: #4ECDC4;
+            color: white;
+            padding: 10px;
+            border-radius: 15px;
+            font-weight: 700;
+            margin: 15px 0 8px;
+            font-size: 1.4rem;
+        }
+        .rank-item {
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        .rank-stamp { font-size: 3rem; }
+        
+        /* その他 */
+        .mute-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+            background: none;
+            border: none;
+            z-index: 200;
+        }
+        .progress-container {
+            width: 100%;
+            max-width: 420px;
+            background: #eee;
+            height: 12px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        スピードたしざん！
+    </header>
+
+    <!-- トップ画面 -->
+    <div id="top-screen" class="screen active">
+        <h1>はやく こたえよう！</h1>
+        <button onclick="startNewSet()" class="big-btn">ゲームを はじめる！</button>
+        <button onclick="showScreen('ranking-screen')" class="big-btn" style="background:#4ECDC4;">きろくを みる</button>
+    </div>
+
+    <!-- 問題画面 -->
+    <div id="game-screen" class="screen">
+        <div style="width:100%; text-align:center; font-size:1.3rem; color:#666; margin-bottom:10px;">
+            <span id="question-count">1 / 20</span>
+        </div>
+        
+        <div id="timer-container">
+            <svg id="timer-svg" width="160" height="160" viewBox="0 0 36 36">
+                <circle id="timer-bg" cx="18" cy="18" r="15" fill="none" stroke="#ddd" stroke-width="4"/>
+                <circle id="timer-progress" cx="18" cy="18" r="15" fill="none" stroke="#FF6B6B" stroke-width="4" 
+                        stroke-dasharray="94.2" stroke-dashoffset="0"/>
+            </svg>
+            <div id="timer-text">2</div>
+        </div>
+        
+        <div id="problem">1 + 1 = </div>
+        
+        <div id="choices"></div>
+    </div>
+
+    <!-- フィードバックオーバーレイ -->
+    <div id="feedback"></div>
+
+    <!-- 結果画面 -->
+    <div id="result-screen" class="screen">
+        <h2 style="font-size:2rem; color:#333;">おわり！ すごいね！</h2>
+        <div style="font-size:1.4rem; margin:10px 0;">てんすう</div>
+        <div id="total-score">85てん！</div>
+        
+        <div id="stamp">🚀</div>
+        
+        <button onclick="startNewSet()" class="big-btn" style="background:#4CAF50; margin-top:30px;">
+            もういちど！
+        </button>
+        <button onclick="showScreen('top-screen')" class="big-btn" style="background:#999; margin-top:10px;">
+            トップにもどる
+        </button>
+    </div>
+
+    <!-- ランキング画面 -->
+    <div id="ranking-screen" class="screen">
+        <h2 style="font-size:2rem; margin-bottom:15px;">きょうの がんばり</h2>
+        <div id="ranking-list"></div>
+        <button onclick="showScreen('top-screen')" class="big-btn" style="background:#999; width:90%; max-width:420px;">
+            もどる
+        </button>
+    </div>
+
+    <button onclick="toggleMute()" class="mute-btn" id="mute-btn">🔊</button>
+
+    <script>
+        // ========================================
+        // 定数（ここを変えると難易度調整できます！）
+        // ========================================
+        const NUM_QUESTIONS = 20;           // 1セットの問題数
+        const TIME_LIMIT = 2000;            // 制限時間（ミリ秒）← 2秒
+        const MIN_NUM = 0;                  // 足し算の最小値
+        const MAX_NUM = 10;                 // 足し算の最大値
+        
+        // スコア計算ルール（残り時間が多いほど高得点）
+        // 残り時間1.6秒以上 → 5点
+        // 1.2秒以上         → 4点
+        // 0.8秒以上         → 3点
+        // 0.4秒以上         → 2点
+        // それ以下          → 1点
+        // （時間切れ・誤答は0点）
+        function calculateScore(remainingMs) {
+            if (remainingMs > 1600) return 5;
+            if (remainingMs > 1200) return 4;
+            if (remainingMs > 800) return 3;
+            if (remainingMs > 400) return 2;
+            return 1;
+        }
+        
+        // スタンプカテゴリー（5段階 × 5種 = 25種）
+        // 実際の画像に差し替えるときは emojis の部分を img src に変更してください
+        const STAMP_CATEGORIES = [
+            { min: 0,   max: 19,  category: "いちばん おそい", emojis: ["🐌","🦥","🐛","🐜","🪲"] },
+            { min: 20,  max: 39,  category: "ゆっくり",       emojis: ["🐢","🐨","🐪","🦒","🐘"] },
+            { min: 40,  max: 59,  category: "ふつうの速さ",   emojis: ["🐶","🐱","🐰","🚲","🛴"] },
+            { min: 60,  max: 79,  category: "はやい！",       emojis: ["🐆","🚗","✈️","🏍️","🦅"] },
+            { min: 80,  max: 100, category: "さいこう はやい！", emojis: ["🚀","🚄","⚡","🌟","🦸"] }
+        ];
+        
+        const STORAGE_KEY = 'speedAdditionRanking';
+        
+        // ========================================
+        // グローバル変数
+        // ========================================
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let totalScore = 0;
+        let timerInterval = null;
+        let startTime = 0;
+        let isMuted = false;
+        let audioContext;
+        
+        // ========================================
+        // 画面切り替え
+        // ========================================
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+        
+        // ========================================
+        // 音再生（4歳児が喜ぶピンポン♪とブッブー）
+        // ========================================
+        function initAudio() {
+            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        function playSound(type) {
+            if (isMuted || !audioContext) return;
+            initAudio();
+            const oscillator = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            oscillator.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            if (type === 'correct') {
+                oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+                gain.gain.value = 0.3;
+                oscillator.start();
+                setTimeout(() => { oscillator.stop(); }, 180);
+            } else {
+                oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
+                gain.gain.value = 0.4;
+                oscillator.start();
+                setTimeout(() => { oscillator.stop(); }, 280);
+            }
+        }
+        
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('mute-btn').textContent = isMuted ? '🔇' : '🔊';
+        }
+        
+        // ========================================
+        // 問題生成
+        // ========================================
+        function generateQuestion() {
+            const a = Math.floor(Math.random() * (MAX_NUM - MIN_NUM + 1)) + MIN_NUM;
+            const b = Math.floor(Math.random() * (MAX_NUM - MIN_NUM + 1)) + MIN_NUM;
+            const correct = a + b;
+            
+            let choices = [correct];
+            while (choices.length < 4) {
+                let wrong = Math.floor(Math.random() * 21);
+                if (wrong !== correct && !choices.includes(wrong)) choices.push(wrong);
+            }
+            // Fisher-Yatesシャッフル（毎回並びが変わる！）
+            for (let i = choices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [choices[i], choices[j]] = [choices[j], choices[i]];
+            }
+            return { a, b, correct, choices };
+        }
+        
+        // ========================================
+        // 問題表示
+        // ========================================
+        function showQuestion() {
+            const q = currentQuestions[currentQuestionIndex];
+            document.getElementById('problem').textContent = `${q.a} + ${q.b} = `;
+            document.getElementById('question-count').textContent = `${currentQuestionIndex + 1} / ${NUM_QUESTIONS}`;
+            
+            const choicesDiv = document.getElementById('choices');
+            choicesDiv.innerHTML = '';
+            
+            q.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice;
+                btn.onclick = () => handleAnswer(choice);
+                choicesDiv.appendChild(btn);
+            });
+            
+            startTimer();
+        }
+        
+        // ========================================
+        // タイマー（円形ゲージ）
+        // ========================================
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            startTime = Date.now();
+            
+            const progress = document.getElementById('timer-progress');
+            const circumference = 94.2;
+            progress.setAttribute('stroke-dasharray', circumference);
+            
+            timerInterval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const remaining = Math.max(0, TIME_LIMIT - elapsed);
+                const progressRatio = remaining / TIME_LIMIT;
+                
+                progress.setAttribute('stroke-dashoffset', circumference * (1 - progressRatio));
+                
+                // 残り秒表示（整数）
+                document.getElementById('timer-text').textContent = Math.ceil(remaining / 1000);
+                
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+            }, 16);
+        }
+        
+        function handleTimeout() {
+            showFeedback(false, 0);
+        }
+        
+        // ========================================
+        // 回答処理
+        // ========================================
+        function handleAnswer(selected) {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            const q = currentQuestions[currentQuestionIndex];
+            const elapsed = Date.now() - startTime;
+            const remainingMs = Math.max(0, TIME_LIMIT - elapsed);
+            const isCorrect = selected === q.correct;
+            
+            let points = 0;
+            if (isCorrect) {
+                points = calculateScore(remainingMs);
+                totalScore += points;
+            }
+            
+            showFeedback(isCorrect, points);
+        }
+        
+        // ========================================
+        // フィードバック演出（0.8秒で自動次へ）
+        // ========================================
+        function showFeedback(isCorrect, points) {
+            const fb = document.getElementById('feedback');
+            fb.style.display = 'block';
+            
+            if (isCorrect) {
+                fb.textContent = `○\n＋${points}`;
+                fb.className = 'correct';
+                playSound('correct');
+            } else {
+                fb.textContent = '×';
+                fb.className = 'wrong';
+                playSound('wrong');
+            }
+            
+            // 0.8秒後に自動で次へ
+            setTimeout(() => {
+                fb.style.display = 'none';
+                currentQuestionIndex++;
+                
+                if (currentQuestionIndex < NUM_QUESTIONS) {
+                    showQuestion();
+                } else {
+                    endSet();
+                }
+            }, 800);
+        }
+        
+        // ========================================
+        // セット開始
+        // ========================================
+        function startNewSet() {
+            currentQuestions = [];
+            for (let i = 0; i < NUM_QUESTIONS; i++) {
+                currentQuestions.push(generateQuestion());
+            }
+            currentQuestionIndex = 0;
+            totalScore = 0;
+            
+            showScreen('game-screen');
+            showQuestion();
+        }
+        
+        // ========================================
+        // セット終了 → 結果表示
+        // ========================================
+        function endSet() {
+            const stampObj = getStamp(totalScore);
+            showScreen('result-screen');
+            
+            document.getElementById('total-score').textContent = `${totalScore}てん！`;
+            const stampEl = document.getElementById('stamp');
+            stampEl.textContent = stampObj.emoji;
+            stampEl.title = stampObj.category;
+            
+            // 保存
+            saveResult(totalScore, stampObj.emoji, stampObj.category);
+        }
+        
+        function getStamp(score) {
+            for (let cat of STAMP_CATEGORIES) {
+                if (score >= cat.min && score <= cat.max) {
+                    const randomEmoji = cat.emojis[Math.floor(Math.random() * cat.emojis.length)];
+                    return { emoji: randomEmoji, category: cat.category };
+                }
+            }
+            // 念のため
+            return { emoji: '🌟', category: 'さいこう はやい！' };
+        }
+        
+        // ========================================
+        // LocalStorage 保存（日付単位・上位10件）
+        // ========================================
+        function saveResult(score, stampEmoji, category) {
+            const today = new Date().toISOString().split('T')[0]; // 2026-03-09形式
+            let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            
+            if (!data[today]) data[today] = [];
+            
+            const entry = {
+                score: score,
+                stampEmoji: stampEmoji,
+                stampCategory: category,
+                timestamp: new Date().toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'})
+            };
+            
+            data[today].push(entry);
+            // スコア降順で上位10件だけ保持
+            data[today].sort((a,b) => b.score - a.score);
+            data[today] = data[today].slice(0, 10);
+            
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+        
+        // ========================================
+        // ランキング表示
+        // ========================================
+        function renderRanking() {
+            const container = document.getElementById('ranking-list');
+            container.innerHTML = '';
+            
+            const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            const dates = Object.keys(data).sort().reverse(); // 新しい順
+            
+            if (dates.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#888; padding:40px;">まだ あそんでないよ<br>はじめて あそぼう！</p>';
+                return;
+            }
+            
+            dates.forEach(date => {
+                const header = document.createElement('div');
+                header.className = 'date-header';
+                header.textContent = date === new Date().toISOString().split('T')[0] 
+                    ? 'きょうの がんばり' : date;
+                container.appendChild(header);
+                
+                data[date].forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'rank-item';
+                    div.innerHTML = `
+                        <div class="rank-stamp">${item.stampEmoji}</div>
+                        <div style="flex:1;">
+                            <div style="font-size:1.8rem; font-weight:900; color:#FF6B6B;">${item.score}てん</div>
+                            <div style="font-size:1.1rem; color:#555;">${item.timestamp}</div>
+                        </div>
+                        <div style="font-size:1rem; color:#666; text-align:right;">${item.stampCategory}</div>
+                    `;
+                    container.appendChild(div);
+                });
+            });
+        }
+        
+        // ========================================
+        // 初期化
+        // ========================================
+        function init() {
+            // 初回読み込み時にランキングも準備
+            renderRanking();
+            
+            // キーボードでも遊べる（保護者さん用）
+            document.addEventListener('keydown', e => {
+                if (e.key === '/' && document.getElementById('top-screen').classList.contains('active')) {
+                    startNewSet();
+                }
+            });
+            
+            // PWAインストール促進（iOS対応）
+            console.log('%c📱 PWA対応済み！ ホーム画面に追加するとオフラインでも遊べます♪', 'color:#4ECDC4; font-size:13px');
+        }
+        
+        // スタート！
+        window.onload = init;
+    </script>
+</body>
+</html>
