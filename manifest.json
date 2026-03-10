@@ -1,0 +1,30 @@
+{
+  "name": "スピードたしざん！",
+  "short_name": "はやたしざん",
+  "description": "4さいのこがはやくたしざんをれんしゅう！",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F9F7E8",
+  "theme_color": "#4ECDC4",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "sp-math-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "sp-math-180.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "sp-math-180.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
