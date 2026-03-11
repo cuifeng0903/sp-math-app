@@ -41,12 +41,14 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             padding: 2vh 4vw;
             gap: 2vh;
         }
         .screen.active { display: flex; }
         
+        #top-screen {
+            justify-content: center;
+        }
         #top-screen h1 {
             font-size: clamp(2.5rem, 12vw, 4.5rem);
             margin-bottom: 5vh;
@@ -69,7 +71,9 @@
         .big-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 #e68a00; }
         
         /* 問題画面 */
-        #game-screen { justify-content: space-between; }
+        #game-screen {
+            justify-content: space-between;
+        }
         #question-count { font-size: clamp(1.1rem, 4vw, 1.3rem); color: #666; margin: 1vh 0; }
         #timer-container {
             position: relative;
@@ -86,7 +90,7 @@
             stroke: var(--accent);
             stroke-width: 5;
             stroke-linecap: round;
-            transition: stroke-dashoffset 0.05s linear;
+            transition: stroke-dashoffset 0.08s linear; /* より滑らかに */
         }
         #timer-text {
             position: absolute;
@@ -140,28 +144,33 @@
             z-index: 100;
             pointer-events: none;
             text-shadow: 0 0 30px rgba(0,0,0,0.3);
-            line-height: 1;
+            line-height: 1.1;
         }
-        .correct { color: #FF4444; animation: pop 0.6s; }
-        .wrong   { color: #4488FF; animation: shake 0.5s; }
+        .correct { color: #FF4444; animation: pop 0.7s ease-out; }
+        .wrong   { color: #4488FF; animation: shake 0.6s ease-out; }
         #score-text {
             font-size: clamp(4rem, 18vw, 6rem);
             font-weight: 900;
             color: #4CAF50;
-            margin-top: -1vh;
+            margin-top: -0.5vh;
         }
         
-        @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0.3); } 60% { transform: translate(-50%, -50%) scale(1.3); } 100% { transform: translate(-50%, -50%) scale(1); } }
-        @keyframes shake { 0%,100% { transform: translate(-50%, -50%); } 25% { transform: translate(calc(-50% - 10vw), -50%); } 75% { transform: translate(calc(-50% + 10vw), -50%); } }
+        @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; } 70% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); } }
+        @keyframes shake { 0%,100% { transform: translate(-50%, -50%); } 20% { transform: translate(calc(-50% - 8vw), -50%); } 40% { transform: translate(calc(-50% + 8vw), -50%); } 60% { transform: translate(calc(-50% - 4vw), -50%); } 80% { transform: translate(calc(-50% + 4vw), -50%); } }
         
         /* 結果画面 */
-        #result-screen h2 { font-size: clamp(1.6rem, 6vw, 2rem); }
+        #result-screen {
+            justify-content: flex-start;
+            padding-bottom: 10vh; /* 下部に余裕を持たせてボタン見切れ防止 */
+        }
+        #result-screen > * { margin: 1.5vh 0; }
         #total-score { font-size: clamp(4rem, 18vw, 5.5rem); font-weight: 900; color: var(--accent); }
-        #stamp-area { text-align: center; margin: 3vh 0; }
+        #stamp-area { text-align: center; margin: 4vh 0 3vh; }
         #stamp { font-size: clamp(8rem, 40vw, 12rem); filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2)); }
         #stamp-name { font-size: clamp(1.8rem, 8vw, 2.5rem); font-weight: 700; color: #555; margin-top: 1vh; }
         
         /* ランキング */
+        #ranking-screen { justify-content: flex-start; }
         #ranking-list { width: 100%; max-width: 460px; overflow-y: auto; flex: 1; padding: 1vh 0; }
         .date-header { background: var(--primary); color: white; padding: 1.5vh; border-radius: 15px; font-size: clamp(1.2rem, 5vw, 1.4rem); margin: 2vh 0 1vh; }
         .rank-item {
@@ -225,7 +234,7 @@
         <div id="timer-container">
             <svg id="timer-svg" viewBox="0 0 36 36">
                 <circle id="timer-bg" cx="18" cy="18" r="16"/>
-                <circle id="timer-progress" cx="18" cy="18" r="16" stroke-dasharray="100.53" stroke-dashoffset="0"/>
+                <circle id="timer-progress" cx="18" cy="18" r="16" stroke-dasharray="100.53096491487338" stroke-dashoffset="100.53096491487338"/>
             </svg>
             <div id="timer-text">2</div>
         </div>
@@ -250,26 +259,25 @@
             <div id="stamp-name">ろけっと</div>
         </div>
         
-        <button onclick="startNewSet()" class="big-btn" style="background:#4CAF50;">もういちど！</button>
+        <button onclick="startNewSet()" class="big-btn" style="background:#4CAF50; margin-top: auto;">もういちど！</button>
         <button onclick="showScreen('top-screen')" class="big-btn" style="background:#999;">トップにもどる</button>
     </div>
 
     <div id="ranking-screen" class="screen">
         <h2 style="font-size: clamp(1.6rem,6vw,2rem); margin-bottom:2vh;">きょうの がんばり</h2>
         <div id="ranking-list"></div>
-        <button onclick="showScreen('top-screen')" class="big-btn" style="background:#999; width:90%; max-width:420px;">もどる</button>
+        <button onclick="showScreen('top-screen')" class="big-btn" style="background:#999; width:90%; max-width:420px; margin-top: auto;">もどる</button>
     </div>
 
     <button onclick="toggleMute()" class="mute-btn" id="mute-btn">🔊</button>
 
     <script>
-        // 定数（ここを変えると難易度調整できます！）
+        // 定数
         const NUM_QUESTIONS = 20;
         const TIME_LIMIT = 2000;
         const MIN_NUM = 0;
         const MAX_NUM = 10;
         
-        // 残り時間による点数（1.2秒以上で5点 → より速さが重視されます）
         function calculateScore(remainingMs) {
             if (remainingMs > 1200) return 5;
             if (remainingMs > 900)  return 4;
@@ -278,7 +286,6 @@
             return 1;
         }
         
-        // スタンプカテゴリー：各々に具体的な名前を5つ用意（子どもが「これもらった！」と実感しやすい）
         const STAMP_CATEGORIES = [
             { min: 0,   max: 19,  category: "いちばん おそい", names: ["かたつむり", "なまけもの", "いもむし", "あり", "てんとう虫"] },
             { min: 20,  max: 39,  category: "ゆっくり",       names: ["かめ", "コアラ", "らくだ", "きりん", "ぞう"] },
@@ -361,21 +368,23 @@
             if (timerInterval) clearInterval(timerInterval);
             startTime = Date.now();
             const progress = document.getElementById('timer-progress');
-            const circumference = 100.53;
+            const circumference = 2 * Math.PI * 16; // ≈100.53096491487338
             progress.setAttribute('stroke-dasharray', circumference);
+            progress.setAttribute('stroke-dashoffset', circumference); // 最初は満タン
             
             timerInterval = setInterval(() => {
                 const elapsed = Date.now() - startTime;
                 const remaining = Math.max(0, TIME_LIMIT - elapsed);
                 const ratio = remaining / TIME_LIMIT;
-                progress.setAttribute('stroke-dashoffset', circumference * (1 - ratio));
+                const offset = circumference * (1 - ratio);
+                progress.setAttribute('stroke-dashoffset', offset);
                 document.getElementById('timer-text').textContent = Math.ceil(remaining / 1000);
                 
                 if (remaining <= 0) {
                     clearInterval(timerInterval);
                     handleTimeout();
                 }
-            }, 16);
+            }, 10); // より細かく更新（10ms）で滑らかに
         }
         
         function handleTimeout() {
@@ -447,8 +456,10 @@
             for (let cat of STAMP_CATEGORIES) {
                 if (score >= cat.min && score <= cat.max) {
                     const idx = Math.floor(Math.random() * cat.names.length);
+                    const allEmojis = ["🐌","🦥","🐛","🐜","🪲","🐢","🐨","🐪","🦒","🐘","🐶","🐱","🐰","🚲","🛴","🐆","🚗","✈️","🏍️","🦅","🚀","🚄","⚡","🌟","🦸"];
+                    const base = STAMP_CATEGORIES.indexOf(cat) * 5;
                     return {
-                        emoji: ["🐌","🦥","🐛","🐜","🪲", "🐢","🐨","🐪","🦒","🐘", "🐶","🐱","🐰","🚲","🛴", "🐆","🚗","✈️","🏍️","🦅", "🚀","🚄","⚡","🌟","🦸"][STAMP_CATEGORIES.indexOf(cat) * 5 + idx],
+                        emoji: allEmojis[base + idx],
                         name: cat.names[idx],
                         category: cat.category
                     };
@@ -511,7 +522,7 @@
         
         function init() {
             renderRanking();
-            console.log('%csp-math-app 更新完了！ スタンプ名を具体的に・JST完全対応♪', 'color:#4ECDC4; font-size:14px');
+            console.log('%csp-math-app 更新完了！ タイマー滑らか＋ボタン見切れ対策♪', 'color:#4ECDC4; font-size:14px');
         }
         window.onload = init;
     </script>
