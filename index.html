@@ -17,6 +17,7 @@
             --accent: #FF6B6B;
             --bg: #F9F7E8;
             --timer-color: #FF4444;
+            --correct-highlight: #4CAF50;
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,107 +33,108 @@
             background: var(--primary);
             color: white;
             text-align: center;
-            padding: 2vh 0;
-            font-size: clamp(1.4rem, 5vw, 1.8rem);
+            padding: 1.8vh 0;
+            font-size: clamp(1.3rem, 4.5vw, 1.7rem);
             font-weight: 900;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
         }
         .screen {
-            height: calc(100vh - 8vh);
+            height: calc(100vh - 7.5vh);
             display: none;
             flex-direction: column;
             align-items: center;
-            padding: 2vh 4vw;
+            padding: 1.5vh 3.5vw;
         }
         .screen.active { display: flex; }
         
         #top-screen { justify-content: center; }
         #top-screen h1 {
-            font-size: clamp(2.5rem, 12vw, 4.5rem);
-            margin-bottom: 5vh;
+            font-size: clamp(2.8rem, 13vw, 5rem);
+            margin-bottom: 6vh;
             color: var(--accent);
-            text-shadow: 4px 4px 0 #fff;
-            text-align: center;
+            text-shadow: 3px 3px 0 #fff;
         }
         .big-btn {
-            font-size: clamp(1.6rem, 7vw, 2.2rem);
-            padding: 4vh 8vw;
-            border-radius: 30px;
+            font-size: clamp(1.5rem, 6.5vw, 2.1rem);
+            padding: 3.5vh 7vw;
+            border-radius: 28px;
             background: #FF9800;
             color: white;
             border: none;
-            box-shadow: 0 8px 0 #e68a00;
-            width: 90%;
-            max-width: 420px;
+            box-shadow: 0 7px 0 #e68a00;
+            width: 92%;
+            max-width: 400px;
             margin: 1vh 0;
         }
-        .big-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 #e68a00; }
+        .big-btn:active { transform: translateY(3px); box-shadow: 0 4px 0 #e68a00; }
         
         /* 問題画面 */
         #game-screen { justify-content: space-between; }
-        #question-count { font-size: clamp(1.1rem, 4vw, 1.3rem); color: #666; margin: 1vh 0; }
+        #question-count { font-size: clamp(1rem, 3.8vw, 1.2rem); color: #666; margin: 0.8vh 0; }
         #timer-container {
             position: relative;
-            width: 32vw;
-            height: 32vw;
-            max-width: 170px;
-            max-height: 170px;
+            width: 34vw;
+            height: 34vw;
+            max-width: 180px;
+            max-height: 180px;
             margin: 1vh 0;
         }
         #timer-svg {
             width: 100%;
             height: 100%;
-            transform: rotate(-90deg); /* 12時位置からスタート */
+            transform: rotate(-90deg);
         }
-        #timer-bg { fill: none; stroke: #eee; stroke-width: 5; }
+        #timer-bg { fill: none; stroke: #eee; stroke-width: 5.5; }
         #timer-progress {
             fill: none;
             stroke: var(--timer-color);
-            stroke-width: 5;
+            stroke-width: 5.5;
             stroke-linecap: round;
-            transition: stroke-dashoffset 0.08s linear;
         }
         #timer-text {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: clamp(1.8rem, 8vw, 2.5rem);
+            font-size: clamp(2rem, 9vw, 2.8rem);
             font-weight: 900;
-            color: #333;
         }
         #problem {
-            font-size: clamp(4rem, 15vw, 6.5rem);
+            font-size: clamp(4.2rem, 16vw, 7rem);
             font-weight: 900;
             background: white;
-            padding: 2vh 6vw;
-            border-radius: 30px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            padding: 1.8vh 5.5vw;
+            border-radius: 28px;
+            box-shadow: 0 9px 18px rgba(0,0,0,0.14);
             text-align: center;
-            min-width: 70vw;
-            max-width: 90vw;
+            min-width: 72vw;
+            max-width: 92vw;
         }
         #choices {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 3vh;
+            gap: 2.8vh;
             width: 100%;
-            max-width: 420px;
-            margin-top: 2vh;
+            max-width: 400px;
+            margin-top: 1.5vh;
         }
         .choice-btn {
-            font-size: clamp(2.5rem, 10vw, 3.5rem);
+            font-size: clamp(2.6rem, 11vw, 3.8rem);
             font-weight: 900;
-            padding: 5vh 0;
+            padding: 4.5vh 0;
             background: #FFEEAD;
             border: none;
-            border-radius: 25px;
-            box-shadow: 0 8px 0 #f0d68a;
+            border-radius: 24px;
+            box-shadow: 0 7px 0 #f0d68a;
             color: #333;
-            pointer-events: auto;
         }
-        .choice-btn:disabled { opacity: 0.4; pointer-events: none; }
-        .choice-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 4px 0 #f0d68a; }
+        .choice-btn.correct-answer {
+            background: var(--correct-highlight);
+            color: white;
+            box-shadow: 0 7px 0 #388E3C;
+        }
+        .choice-btn:disabled { opacity: 0.45; }
+        .choice-btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 4px 0 #f0d68a; }
         
         /* フィードバック */
         #feedback {
@@ -140,29 +142,29 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: clamp(8rem, 35vw, 14rem);
+            font-size: clamp(9rem, 38vw, 15rem);
             font-weight: 900;
             z-index: 100;
             pointer-events: none;
-            text-shadow: 0 0 30px rgba(0,0,0,0.3);
-            line-height: 1.1;
+            text-shadow: 0 0 35px rgba(0,0,0,0.35);
+            line-height: 1.05;
         }
         .correct { color: #FF4444; animation: pop 0.7s ease-out; }
         .wrong   { color: #4488FF; animation: shake 0.6s ease-out; }
         #score-text {
-            font-size: clamp(4rem, 18vw, 6rem);
+            font-size: clamp(4.5rem, 20vw, 7rem);
             font-weight: 900;
             color: #4CAF50;
-            margin-top: -0.5vh;
+            margin-top: -1vh;
         }
         
-        @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; } 70% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); } }
-        @keyframes shake { 0%,100% { transform: translate(-50%, -50%); } 20% { transform: translate(calc(-50% - 8vw), -50%); } 40% { transform: translate(calc(-50% + 8vw), -50%); } 60% { transform: translate(calc(-50% - 4vw), -50%); } 80% { transform: translate(calc(-50% + 4vw), -50%); } }
+        @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; } 65% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); } }
+        @keyframes shake { 0%,100% { transform: translate(-50%, -50%); } 25% { transform: translate(calc(-50% - 9vw), -50%); } 75% { transform: translate(calc(-50% + 9vw), -50%); } }
         
-        /* 結果画面：1画面に収まるよう調整 */
+        /* 結果画面：1画面に確実に収まるよう割合指定 */
         #result-screen {
             justify-content: space-between;
-            padding: 2vh 4vw 12vh; /* 下部に余裕を持たせてボタン見切れ防止 */
+            padding: 2vh 4vw 10vh;
         }
         #result-content {
             flex: 1;
@@ -170,32 +172,33 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2vh;
+            gap: 1.8vh;
+            width: 100%;
         }
-        #total-score { font-size: clamp(4rem, 18vw, 5.5rem); font-weight: 900; color: var(--accent); }
-        #stamp-area { text-align: center; margin: 3vh 0; }
-        #stamp { font-size: clamp(8rem, 40vw, 12rem); filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2)); }
-        #stamp-name { font-size: clamp(1.8rem, 8vw, 2.5rem); font-weight: 700; color: #555; margin-top: 1vh; }
+        #total-score { font-size: clamp(3.8rem, 17vw, 5.2rem); font-weight: 900; color: var(--accent); }
+        #stamp-area { text-align: center; margin: 3vh 0 2vh; }
+        #stamp { font-size: clamp(7.5rem, 38vw, 11rem); filter: drop-shadow(0 9px 14px rgba(0,0,0,0.18)); }
+        #stamp-name { font-size: clamp(1.7rem, 7.5vw, 2.3rem); font-weight: 700; color: #555; margin-top: 0.8vh; }
         
         /* ランキング */
         #ranking-screen { justify-content: flex-start; }
         #ranking-list { width: 100%; max-width: 460px; overflow-y: auto; flex: 1; padding: 1vh 0; }
-        .date-header { background: var(--primary); color: white; padding: 1.5vh; border-radius: 15px; font-size: clamp(1.2rem, 5vw, 1.4rem); margin: 2vh 0 1vh; }
+        .date-header { background: var(--primary); color: white; padding: 1.4vh; border-radius: 14px; font-size: clamp(1.1rem, 4.8vw, 1.3rem); margin: 1.8vh 0 0.8vh; }
         .rank-item {
             background: white;
-            padding: 2vh;
-            border-radius: 20px;
-            margin-bottom: 1.5vh;
+            padding: 1.8vh;
+            border-radius: 18px;
+            margin-bottom: 1.2vh;
             display: flex;
             align-items: center;
-            gap: 3vw;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            gap: 2.8vw;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.07);
         }
         .rank-position {
             position: relative;
-            width: 60px;
-            height: 60px;
-            font-size: 2.2rem;
+            width: 55px;
+            height: 55px;
+            font-size: 2rem;
             font-weight: 900;
             color: #333;
             display: flex;
@@ -217,9 +220,9 @@
         
         .mute-btn {
             position: fixed;
-            bottom: 2vh;
-            right: 4vw;
-            font-size: clamp(1.6rem, 7vw, 2rem);
+            bottom: 1.8vh;
+            right: 3.5vw;
+            font-size: clamp(1.5rem, 6.5vw, 1.9rem);
             background: none;
             border: none;
             z-index: 200;
@@ -242,7 +245,7 @@
         <div id="timer-container">
             <svg id="timer-svg" viewBox="0 0 36 36">
                 <circle id="timer-bg" cx="18" cy="18" r="16"/>
-                <circle id="timer-progress" cx="18" cy="18" r="16" stroke-dasharray="100.53096491487338" stroke-dashoffset="100.53096491487338"/>
+                <circle id="timer-progress" cx="18" cy="18" r="16" stroke-dasharray="100.53096491487338" stroke-dashoffset="0"/>
             </svg>
             <div id="timer-text">2</div>
         </div>
@@ -260,7 +263,7 @@
     <div id="result-screen" class="screen">
         <div id="result-content">
             <h2>おわり！ すごいね！</h2>
-            <div style="font-size: clamp(1.2rem,5vw,1.4rem); margin:1vh 0;">てんすう</div>
+            <div style="font-size: clamp(1.1rem,4.8vw,1.3rem); margin:0.8vh 0;">てんすう</div>
             <div id="total-score">85てん！</div>
             
             <div id="stamp-area">
@@ -269,14 +272,14 @@
             </div>
         </div>
         
-        <button onclick="startNewSet()" class="big-btn" style="background:#4CAF50;">もういちど！</button>
-        <button onclick="showScreen('top-screen')" class="big-btn" style="background:#999;">トップにもどる</button>
+        <button onclick="startNewSet()" class="big-btn" style="background:#4CAF50; margin-top: 2vh;">もういちど！</button>
+        <button onclick="showScreen('top-screen')" class="big-btn" style="background:#999; margin-top: 1vh;">トップにもどる</button>
     </div>
 
     <div id="ranking-screen" class="screen">
-        <h2 style="font-size: clamp(1.6rem,6vw,2rem); margin-bottom:2vh;">きょうの がんばり</h2>
+        <h2 style="font-size: clamp(1.5rem,5.8vw,1.9rem); margin-bottom:1.8vh;">きょうの がんばり</h2>
         <div id="ranking-list"></div>
-        <button onclick="showScreen('top-screen')" class="big-btn" style="background:#999; width:90%; max-width:420px; margin-top: auto;">もどる</button>
+        <button onclick="showScreen('top-screen')" class="big-btn" style="background:#999; width:92%; max-width:400px; margin-top: auto;">もどる</button>
     </div>
 
     <button onclick="toggleMute()" class="mute-btn" id="mute-btn">🔊</button>
@@ -368,44 +371,50 @@
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
                 btn.textContent = choice;
+                btn.dataset.value = choice;
                 btn.onclick = () => { if (!answered) handleAnswer(choice); };
                 choicesDiv.appendChild(btn);
             });
-            startTimer();
+            startTimer(); // 毎回完全にリセット
         }
         
         function startTimer() {
-            if (timerInterval) clearInterval(timerInterval);
+            if (timerInterval) cancelAnimationFrame(timerInterval);
             startTime = Date.now();
             const progress = document.getElementById('timer-progress');
             const circumference = 2 * Math.PI * 16;
             progress.setAttribute('stroke-dasharray', circumference);
-            progress.setAttribute('stroke-dashoffset', 0); // 最初は満タン（赤で全表示）
+            progress.setAttribute('stroke-dashoffset', 0); // 満タン（赤でスタート）
+            document.getElementById('timer-text').textContent = Math.ceil(TIME_LIMIT / 1000);
             
-            timerInterval = setInterval(() => {
+            function animate() {
                 const elapsed = Date.now() - startTime;
                 const remaining = Math.max(0, TIME_LIMIT - elapsed);
                 const ratio = remaining / TIME_LIMIT;
-                const offset = circumference * ratio; // 減っていく方向に調整（反時計回り）
+                const offset = circumference * ratio;
                 progress.setAttribute('stroke-dashoffset', offset);
                 document.getElementById('timer-text').textContent = Math.ceil(remaining / 1000);
                 
-                if (remaining <= 0) {
-                    clearInterval(timerInterval);
+                if (remaining > 0) {
+                    timerInterval = requestAnimationFrame(animate);
+                } else {
                     handleTimeout();
                 }
-            }, 10);
+            }
+            timerInterval = requestAnimationFrame(animate);
         }
         
         function handleTimeout() {
             answered = true;
+            highlightCorrectAnswer();
             document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
             showFeedback(false, 0);
         }
         
         function handleAnswer(selected) {
-            if (timerInterval) clearInterval(timerInterval);
+            if (timerInterval) cancelAnimationFrame(timerInterval);
             answered = true;
+            highlightCorrectAnswer();
             document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
             
             const q = currentQuestions[currentQuestionIndex];
@@ -415,6 +424,13 @@
             let points = isCorrect ? calculateScore(remainingMs) : 0;
             totalScore += points;
             showFeedback(isCorrect, points);
+        }
+        
+        function highlightCorrectAnswer() {
+            const correctBtn = Array.from(document.querySelectorAll('.choice-btn')).find(btn => 
+                parseInt(btn.dataset.value) === currentQuestions[currentQuestionIndex].correct
+            );
+            if (correctBtn) correctBtn.classList.add('correct-answer');
         }
         
         function showFeedback(isCorrect, points) {
@@ -520,10 +536,10 @@
                     div.innerHTML = `
                         <div class="rank-position ${rankClass}">${idx + 1}</div>
                         <div style="flex:1;">
-                            <div style="font-size: clamp(1.5rem,7vw,1.8rem); font-weight:900; color:var(--accent);">${item.score}てん</div>
-                            <div style="font-size: clamp(1rem,4vw,1.1rem); color:#555;">${item.timestamp}</div>
+                            <div style="font-size: clamp(1.4rem,6.5vw,1.7rem); font-weight:900; color:var(--accent);">${item.score}てん</div>
+                            <div style="font-size: clamp(0.95rem,3.8vw,1.05rem); color:#555;">${item.timestamp}</div>
                         </div>
-                        <div style="font-size: clamp(1.2rem,5vw,1.6rem);">${item.stampEmoji}</div>
+                        <div style="font-size: clamp(1.8rem,8vw,2.4rem);">${item.stampEmoji}</div>
                     `;
                     container.appendChild(div);
                 });
@@ -532,7 +548,7 @@
         
         function init() {
             renderRanking();
-            console.log('%csp-math-app 更新完了！ タイマー赤一色スタート＋結果画面1画面収納♪', 'color:#4ECDC4; font-size:14px');
+            console.log('%csp-math-app 更新完了！ タイマーリセット＋正解ハイライト＋結果画面1画面完璧♪', 'color:#4ECDC4; font-size:14px');
         }
         window.onload = init;
     </script>
