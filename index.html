@@ -161,10 +161,10 @@
         @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; } 65% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); } }
         @keyframes shake { 0%,100% { transform: translate(-50%, -50%); } 25% { transform: translate(calc(-50% - 9vw), -50%); } 75% { transform: translate(calc(-50% + 9vw), -50%); } }
         
-        /* 結果画面：1画面に確実に収まるよう割合指定 */
+        /* 結果画面：下部にボタン1つ分以上の余白を確保 */
         #result-screen {
             justify-content: space-between;
-            padding: 2vh 4vw 10vh;
+            padding: 2vh 4vw 18vh; /* ← ここを増やして下部に余白をたっぷり */
         }
         #result-content {
             flex: 1;
@@ -375,7 +375,7 @@
                 btn.onclick = () => { if (!answered) handleAnswer(choice); };
                 choicesDiv.appendChild(btn);
             });
-            startTimer(); // 毎回完全にリセット
+            startTimer();
         }
         
         function startTimer() {
@@ -384,7 +384,7 @@
             const progress = document.getElementById('timer-progress');
             const circumference = 2 * Math.PI * 16;
             progress.setAttribute('stroke-dasharray', circumference);
-            progress.setAttribute('stroke-dashoffset', 0); // 満タン（赤でスタート）
+            progress.setAttribute('stroke-dashoffset', 0);
             document.getElementById('timer-text').textContent = Math.ceil(TIME_LIMIT / 1000);
             
             function animate() {
@@ -548,7 +548,7 @@
         
         function init() {
             renderRanking();
-            console.log('%csp-math-app 更新完了！ タイマーリセット＋正解ハイライト＋結果画面1画面完璧♪', 'color:#4ECDC4; font-size:14px');
+            console.log('%csp-math-app 更新完了！ 結果画面下部にボタン1つ分の余白を追加♪', 'color:#4ECDC4; font-size:14px');
         }
         window.onload = init;
     </script>
